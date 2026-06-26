@@ -24,7 +24,7 @@ export async function getAuthToken() {
   }
 
   try {
-    const response = await fetch('http://4.224.186.213/evaluation-service/auth', {
+    const response = await fetch('/evaluation-service/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(CREDENTIALS)

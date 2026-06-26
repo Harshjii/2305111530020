@@ -20,7 +20,7 @@ export async function fetchNotifications(params = {}) {
       query.append("notification_type", params.notification_type);
     }
 
-    const url = `http://4.224.186.213/evaluation-service/notifications?${query.toString()}`;
+    const url = `/evaluation-service/notifications?${query.toString()}`;
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`
