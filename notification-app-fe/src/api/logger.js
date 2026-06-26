@@ -16,7 +16,7 @@ async function getAuthToken() {
       if (payload.MapClaims.exp > Date.now() / 1000 + 60) {
         return cachedToken;
       }
-    } catch (e) {
+    } catch {
       cachedToken = null;
     }
   }

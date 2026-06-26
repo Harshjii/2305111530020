@@ -1,10 +1,10 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect, useCallback } from "react";
 import {
   Alert,
   Badge,
   Box,
   CircularProgress,
-  Divider,
   Pagination,
   Stack,
   Typography,
@@ -64,7 +64,7 @@ export function NotificationsPage() {
     try {
       const stored = localStorage.getItem("campus_notifications_read");
       return stored ? JSON.parse(stored) : [];
-    } catch (e) {
+    } catch {
       return [];
     }
   });

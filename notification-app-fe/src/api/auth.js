@@ -18,7 +18,7 @@ export async function getAuthToken() {
       if (payload.MapClaims.exp > Date.now() / 1000 + 60) {
         return cached;
       }
-    } catch (e) {
+    } catch {
       localStorage.removeItem(TOKEN_KEY);
     }
   }

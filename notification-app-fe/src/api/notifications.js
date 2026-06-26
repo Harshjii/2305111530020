@@ -37,7 +37,9 @@ export async function fetchNotifications(params = {}) {
         } else if (parsed.message) {
           parsedError = parsed.message;
         }
-      } catch (e) {}
+      } catch {
+        // Fall back to raw text if JSON parsing fails
+      }
       
       const errorMsg = `API Error: ${response.status} - ${parsedError}`;
       await Log("fetchNotifications", "error", "notification-app-fe", errorMsg);
