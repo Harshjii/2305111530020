@@ -1,12 +1,56 @@
-const TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiYXVkIjoiaHR0cDovLzIwLjI0NC41Ni4xNDQvZXZhbHVhdGlvbi1zZXJ2aWNlIiwiZW1haWwiOiJoYXJzaC5ndXB0YTIwMjNAZ2xiYWphamdyb3VwLm9yZyIsImV4cCI6MTc4MjQ1Mzg1NiwiaWF0IjoxNzgyNDUyOTU2LCJpc3MiOiJBZmZvcmQgTWVkaWNhbCBUZWNobm9sb2dpZXMgUHJpdmF0ZSBMaW1pdGVkIiwianRpIjoiZDJlNGIxYzUtZmUxZC00MjgzLTliNTUtNjIzNzg0ODM1Y2ZhIiwibG9jYWxlIjoiZW4tSU4iLCJuYW1lIjoiaGFyc2ggZ3VwdGEiLCJzdWIiOiI0OTM2Y2ZjZS04YmY5LTQwMmYtOTRjYi00MzEzZjU2OGY3ZDkifSwiZW1haWwiOiJoYXJzaC5ndXB0YTIwMjNAZ2xiYWphamdyb3VwLm9yZyIsIm5hbWUiOiJoYXJzaCBndXB0YSIsInJvbGxObyI6IjIzMDUxMTE1MzAwMjAiLCJhY2Nlc3NDb2RlIjoieHhrSm5rIiwiY2xpZW50SUQiOiI0OTM2Y2ZjZS04YmY5LTQwMmYtOTRjYi00MzEzZjU2OGY3ZDkiLCJjbGllbnRTZWNyZXQiOiJhVWdweFJCZktjR1dYUW1RIn0.4qHwQBgEWlSKQxR3Kn8Nuuf5-Fr6LEcZLpLP2JJgpQk";
+const CREDENTIALS = {
+  email: 'harsh.gupta2023@glbajajgroup.org',
+  name: 'harsh gupta',
+  rollNo: '2305111530020',
+  accessCode: 'xxkJnk',
+  clientID: '4936cfce-8bf9-402f-94cb-4313f568f7d9',
+  clientSecret: 'aUgpxRBfKcGWXQmQ' // Typo fixed from aUgpxRBf-cGWXQmQ
+};
+
+let cachedToken = null;
+
+async function getAuthToken() {
+  if (cachedToken) {
+    try {
+      const payload = JSON.parse(atob(cachedToken.split('.')[1]));
+      // Buffer of 1 minute (60s)
+      if (payload.MapClaims.exp > Date.now() / 1000 + 60) {
+        return cachedToken;
+      }
+    } catch (e) {
+      cachedToken = null;
+    }
+  }
+
+  try {
+    const response = await fetch('http://4.224.186.213/evaluation-service/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(CREDENTIALS)
+    });
+    if (response.ok) {
+      const data = await response.json();
+      cachedToken = data.access_token;
+      return cachedToken;
+    }
+  } catch (err) {
+    console.error("Authentication for logging failed", err);
+  }
+  return null;
+}
 
 export const Log = async (stack, level, pkg, message) => {
   try {
+    const token = await getAuthToken();
+    if (!token) {
+      console.warn("Skipping Log due to missing token");
+      return;
+    }
     await fetch("http://4.224.186.213/evaluation-service/logs", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${TOKEN}`
+        "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({
         stack,
@@ -18,4 +62,4 @@ export const Log = async (stack, level, pkg, message) => {
   } catch (error) {
     console.error("Logging failed", error);
   }
-};
+};
